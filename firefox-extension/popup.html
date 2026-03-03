@@ -2,20 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
   <link rel="stylesheet" href="styles.css">
+  <title>wearelinked</title>
 </head>
 <body>
   <div id="app">
     <header>
-      <img src="icon48.png" class="header-logo" alt="">
+      <img src="icon48.png" alt="" class="header-logo">
       <h1>wearelinked</h1>
+      <label class="toggle-switch" title="Show tooltips on hover">
+        <input type="checkbox" id="tooltip-toggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
     </header>
-    <p class="tagline">link tracker</p>
+    <p class="tagline">see where links really go</p>
     <div id="verdict"></div>
     <div id="breakdown" class="hidden"></div>
     <div id="empty" class="empty hidden">
       <div class="empty-icon">--</div>
-      <div>No tracking links found on this site.</div>
+      <div>No link tracking found on this page.</div>
     </div>
   </div>
   <script src="popup.js"></script>

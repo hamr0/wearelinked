@@ -1,0 +1,6 @@
+a[data-wearelinked] {
+  background-image: linear-gradient(to right, #e74c3c, #e74c3c) !important;
+  background-size: 100% 2px !important;
+  background-position: bottom !important;
+  background-repeat: no-repeat !important;
+}
