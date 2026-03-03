@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "wearelinked",
   "version": "0.1.0",
-  "description": "See where links actually go before you click.",
-  "permissions": ["activeTab", "storage", "webRequest"],
+  "description": "Browser extension that exposes hidden redirects and tracking tags in links \u2014 see the real destination before you click.",
+  "permissions": ["activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",
