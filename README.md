@@ -6,6 +6,8 @@ Every time you click a link, it might not go where you think. Sites wrap URLs th
 
 Everything runs locally in your browser — no data is collected, transmitted, or shared.
 
+![wearelinked popup](store-assets/linked.png)
+
 ## What it detects
 - **Redirect wrappers** — Google, Facebook, YouTube, and Outlook redirect URLs unwrapped to show the real destination
 - **URL shorteners** — t.co, bit.ly, tinyurl.com, ow.ly, goo.gl flagged as hiding the real destination
