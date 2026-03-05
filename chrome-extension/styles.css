@@ -97,6 +97,7 @@ h1 {
   padding: 14px 0;
   margin-bottom: 14px;
   border-bottom: 1px solid #2a2a4a;
+  text-align: center;
 }
 
 .verdict-domain {
@@ -159,6 +160,27 @@ h1 {
   color: #666;
   line-height: 1.6;
   white-space: pre-line;
+}
+
+/* ── Provider pills ── */
+
+.provider-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.provider-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  border: 1px solid;
+  cursor: default;
+  white-space: nowrap;
 }
 
 /* ── Empty ── */

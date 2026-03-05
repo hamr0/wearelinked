@@ -1,14 +1,35 @@
 "use strict";
 
-// ── Tracking parameters ──
+// ── Tracking parameters mapped to providers ──
 
-var TRACKING_PARAMS = [
-  "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "utm_id",
-  "fbclid", "gclid", "dclid", "msclkid", "mc_eid", "mc_cid",
-  "_ga", "_gl", "_hsenc", "_hsmi", "_openstat",
-  "yclid", "twclid", "ttclid", "li_fat_id", "igshid",
-  "ref_src", "ref_url"
-];
+var TRACKING_PROVIDERS = {
+  "utm_source":   { provider: "Google Analytics", color: "#4285f4" },
+  "utm_medium":   { provider: "Google Analytics", color: "#4285f4" },
+  "utm_campaign": { provider: "Google Analytics", color: "#4285f4" },
+  "utm_term":     { provider: "Google Analytics", color: "#4285f4" },
+  "utm_content":  { provider: "Google Analytics", color: "#4285f4" },
+  "utm_id":       { provider: "Google Analytics", color: "#4285f4" },
+  "gclid":        { provider: "Google",           color: "#4285f4" },
+  "dclid":        { provider: "Google",           color: "#4285f4" },
+  "_ga":          { provider: "Google",           color: "#4285f4" },
+  "_gl":          { provider: "Google",           color: "#4285f4" },
+  "fbclid":       { provider: "Meta",             color: "#1877f2" },
+  "igshid":       { provider: "Instagram",        color: "#e1306c" },
+  "msclkid":      { provider: "Microsoft",        color: "#00a4ef" },
+  "mc_eid":       { provider: "Mailchimp",        color: "#ffe01b" },
+  "mc_cid":       { provider: "Mailchimp",        color: "#ffe01b" },
+  "_hsenc":       { provider: "HubSpot",          color: "#ff7a59" },
+  "_hsmi":        { provider: "HubSpot",          color: "#ff7a59" },
+  "_openstat":    { provider: "OpenStat",         color: "#9b59b6" },
+  "yclid":        { provider: "Yandex",           color: "#fc3f1d" },
+  "twclid":       { provider: "X",                color: "#a0a0a0" },
+  "ttclid":       { provider: "TikTok",           color: "#ee1d52" },
+  "li_fat_id":    { provider: "LinkedIn",         color: "#0a66c2" },
+  "ref_src":      { provider: "Referral",         color: "#888888" },
+  "ref_url":      { provider: "Referral",         color: "#888888" },
+};
+
+var TRACKING_PARAMS = Object.keys(TRACKING_PROVIDERS);
 
 // ── Redirect wrapper definitions ──
 
@@ -95,6 +116,19 @@ function cleanUrl(url) {
   } catch (e) {
     return url;
   }
+}
+
+function getProviderGroups(params) {
+  var groups = {};
+  for (var i = 0; i < params.length; i++) {
+    var info = TRACKING_PROVIDERS[params[i]];
+    if (!info) continue;
+    if (!groups[info.provider]) {
+      groups[info.provider] = { color: info.color, params: [] };
+    }
+    groups[info.provider].params.push(params[i]);
+  }
+  return groups;
 }
 
 function getDomain(url) {
@@ -231,35 +265,29 @@ function showTooltip(anchor, x, y) {
   if (!item) return;
 
   var tip = createTooltip();
-  var html = "";
+  while (tip.firstChild) tip.removeChild(tip.firstChild);
 
   if (item.isRedirectWrapper) {
-    html += '<div style="color:#e74c3c;font-weight:600;margin-bottom:4px">' +
-      escapeHtml(item.wrapperName) + ' redirect</div>';
+    tip.appendChild(styledDiv("#e74c3c", "font-weight:600;margin-bottom:4px", item.wrapperName + " redirect"));
     if (item.unwrappedUrl) {
-      html += '<div style="color:#888;font-size:11px">Real destination:</div>' +
-        '<div style="color:#6bc5e7;font-family:monospace;font-size:11px;margin-bottom:6px">' +
-        escapeHtml(getDomain(item.unwrappedUrl)) + '</div>';
+      tip.appendChild(styledDiv("#888", "font-size:11px", "Real destination:"));
+      tip.appendChild(styledDiv("#6bc5e7", "font-family:monospace;font-size:11px;margin-bottom:6px", getDomain(item.unwrappedUrl)));
     } else {
-      html += '<div style="color:#888;font-size:11px;margin-bottom:6px">Cannot resolve locally</div>';
+      tip.appendChild(styledDiv("#888", "font-size:11px;margin-bottom:6px", "Cannot resolve locally"));
     }
   }
 
   if (item.trackingParams.length > 0) {
     if (!item.isRedirectWrapper) {
-      html += '<div style="color:#e0a458;font-weight:600;margin-bottom:4px">This link is tracking your click</div>';
+      tip.appendChild(styledDiv("#e0a458", "font-weight:600;margin-bottom:4px", "This link is tracking your click"));
     }
-    html += '<div style="color:#e0a458;font-weight:600">' +
-      item.trackingParams.length + ' tracking tag' +
-      (item.trackingParams.length !== 1 ? 's' : '') + ' on this link</div>' +
-      '<div style="color:#666;font-size:11px">' +
-      escapeHtml(item.trackingParams.join(", ")) + '</div>';
+    tip.appendChild(styledDiv("#e0a458", "font-weight:600",
+      item.trackingParams.length + " tracking tag" + (item.trackingParams.length !== 1 ? "s" : "") + " on this link"));
+    tip.appendChild(createPillRow(getProviderGroups(item.trackingParams)));
   }
 
-  html += '<div style="color:#4a9;font-family:monospace;font-size:11px;margin-top:6px;border-top:1px solid #2a2a4a;padding-top:6px">' +
-    escapeHtml(truncate(item.cleanHref, 120)) + '</div>';
-
-  tip.innerHTML = html;
+  tip.appendChild(styledDiv("#4a9", "font-family:monospace;font-size:11px;margin-top:6px;border-top:1px solid #2a2a4a;padding-top:6px",
+    truncate(item.cleanHref, 120)));
   tip.style.display = "block";
 
   var rect = tip.getBoundingClientRect();
@@ -277,10 +305,33 @@ function hideTooltip() {
   if (tooltipEl) tooltipEl.style.display = "none";
 }
 
-function escapeHtml(str) {
-  var div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
+function styledDiv(color, style, text) {
+  var d = document.createElement("div");
+  d.style.cssText = "color:" + color + ";" + style;
+  d.textContent = text;
+  return d;
+}
+
+function createPill(name, color) {
+  var pill = document.createElement("span");
+  pill.textContent = name;
+  pill.style.cssText = "display:inline-block;padding:2px 8px;margin:2px 3px 2px 0;border-radius:10px;" +
+    "font-size:10px;font-weight:600;line-height:1.4;" +
+    "background:" + color + "22;color:" + color + ";border:1px solid " + color + "44;";
+  return pill;
+}
+
+function createPillRow(groups) {
+  var row = document.createElement("div");
+  row.style.cssText = "display:flex;flex-wrap:wrap;margin-top:4px;";
+  var providers = Object.keys(groups);
+  for (var i = 0; i < providers.length; i++) {
+    var g = groups[providers[i]];
+    var pill = createPill(providers[i], g.color);
+    pill.title = g.params.join(", ");
+    row.appendChild(pill);
+  }
+  return row;
 }
 
 function truncate(str, max) {

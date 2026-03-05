@@ -1,5 +1,23 @@
 "use strict";
 
+var PARAM_TO_PROVIDER = {
+  "utm_source": "Google Analytics", "utm_medium": "Google Analytics", "utm_campaign": "Google Analytics",
+  "utm_term": "Google Analytics", "utm_content": "Google Analytics", "utm_id": "Google Analytics",
+  "gclid": "Google", "dclid": "Google", "_ga": "Google", "_gl": "Google",
+  "fbclid": "Meta", "igshid": "Instagram", "msclkid": "Microsoft",
+  "mc_eid": "Mailchimp", "mc_cid": "Mailchimp",
+  "_hsenc": "HubSpot", "_hsmi": "HubSpot", "_openstat": "OpenStat",
+  "yclid": "Yandex", "twclid": "X", "ttclid": "TikTok",
+  "li_fat_id": "LinkedIn", "ref_src": "Referral", "ref_url": "Referral",
+};
+
+var PROVIDER_COLORS = {
+  "Google Analytics": "#4285f4", "Google": "#4285f4", "Meta": "#1877f2",
+  "Instagram": "#e1306c", "Microsoft": "#00a4ef", "Mailchimp": "#ffe01b",
+  "HubSpot": "#ff7a59", "OpenStat": "#9b59b6", "Yandex": "#fc3f1d",
+  "X": "#a0a0a0", "TikTok": "#ee1d52", "LinkedIn": "#0a66c2", "Referral": "#888888",
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   // Load tooltip toggle state
   browser.runtime.sendMessage({ type: "getSettings" }).then(function (settings) {
@@ -119,13 +137,36 @@ function buildBreakdown(container, items, totals) {
         allParams[items[j].trackingParams[k]] = true;
       }
     }
-    var paramNames = Object.keys(allParams);
-    details.push(paramNames.join(", ") + " on " + domainSummary(trackingDomains));
+    details.push("on " + domainSummary(trackingDomains));
   }
 
   var context = el("div", "breakdown-context");
   context.textContent = details.join(" \u00B7 ");
   container.appendChild(context);
+
+  // Provider pills
+  if (totals.tracked > 0) {
+    var providers = {};
+    var paramKeys = Object.keys(allParams);
+    for (var p = 0; p < paramKeys.length; p++) {
+      var prov = PARAM_TO_PROVIDER[paramKeys[p]];
+      if (prov && !providers[prov]) providers[prov] = [];
+      if (prov) providers[prov].push(paramKeys[p]);
+    }
+    var pillRow = el("div", "provider-pills");
+    var provNames = Object.keys(providers);
+    for (var q = 0; q < provNames.length; q++) {
+      var pill = el("span", "provider-pill");
+      pill.textContent = provNames[q];
+      pill.title = providers[provNames[q]].join(", ");
+      var color = PROVIDER_COLORS[provNames[q]] || "#888";
+      pill.style.background = color + "22";
+      pill.style.color = color;
+      pill.style.borderColor = color + "44";
+      pillRow.appendChild(pill);
+    }
+    container.appendChild(pillRow);
+  }
 }
 
 function domainSummary(domainCounts) {
