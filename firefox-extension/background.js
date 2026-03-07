@@ -37,8 +37,8 @@ browser.runtime.onMessage.addListener(function (message, sender) {
 
 function updateBadge(tabId, count) {
   var text = count > 0 ? String(count) : "0";
-  browser.browserAction.setBadgeText({ text: text, tabId: tabId });
-  browser.browserAction.setBadgeBackgroundColor({
+  browser.action.setBadgeText({ text: text, tabId: tabId });
+  browser.action.setBadgeBackgroundColor({
     color: count > 0 ? "#e74c3c" : "#555555",
     tabId: tabId,
   });

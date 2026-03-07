@@ -1,10 +1,11 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "wearelinked",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Browser extension that exposes hidden redirects and tracking tags in links \u2014 see the real destination before you click.",
-  "permissions": ["activeTab", "storage", "<all_urls>"],
-  "browser_action": {
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icon16.png",
@@ -13,7 +14,8 @@
     }
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js"],
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -30,7 +32,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "wearelinked-v2@weare.tools",
+      "id": "wearelinked@weare.tools",
       "data_collection_permissions": {
         "required": ["none"],
         "optional": []

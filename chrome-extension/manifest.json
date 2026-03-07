@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "wearelinked",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Browser extension that exposes hidden redirects and tracking tags in links \u2014 see the real destination before you click.",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["<all_urls>"],

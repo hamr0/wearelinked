@@ -373,6 +373,10 @@ browser.storage.onChanged.addListener(function (changes, area) {
 
 scanLinks();
 
+window.addEventListener("pageshow", function (e) {
+  if (e.persisted) sendResults();
+});
+
 var observer = new MutationObserver(function (mutations) {
   for (var i = 0; i < mutations.length; i++) {
     var nodes = mutations[i].addedNodes;
