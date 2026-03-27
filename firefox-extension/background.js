@@ -7,11 +7,44 @@ function tabKey(tabId) {
   return "tab:" + tabId;
 }
 
+function mergeItems(existing, incoming) {
+  var merged = existing.slice();
+  for (var i = 0; i < incoming.length; i++) {
+    var found = false;
+    for (var j = 0; j < merged.length; j++) {
+      if (merged[j].href === incoming[i].href) { found = true; break; }
+    }
+    if (!found) merged.push(incoming[i]);
+  }
+  return merged;
+}
+
+function recount(items) {
+  var wrappers = 0;
+  var tracked = 0;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].isRedirectWrapper) wrappers++;
+    if (items[i].trackingParams.length > 0) tracked++;
+  }
+  return { wrappers: wrappers, tracked: tracked, total: items.length };
+}
+
 browser.runtime.onMessage.addListener(function (message, sender) {
   if (message.type === "scanResult" && sender.tab) {
     var tabId = sender.tab.id;
-    tabData[tabKey(tabId)] = message;
-    updateBadge(tabId, message.totals.total);
+    var key = tabKey(tabId);
+    var existing = tabData[key];
+    var merged = existing ? mergeItems(existing.items, message.items) : message.items;
+    var totals = recount(merged);
+    tabData[key] = {
+      type: "scanResult",
+      domain: message.domain,
+      url: message.url,
+      timestamp: message.timestamp,
+      items: merged,
+      totals: totals,
+    };
+    updateBadge(tabId, totals.total);
     return;
   }
 
